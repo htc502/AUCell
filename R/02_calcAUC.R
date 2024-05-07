@@ -258,6 +258,19 @@ setMethod("AUCell_calcAUC", "GeneSetCollection",
   
   aucThreshold <- round(aucMaxRank)
   ########### NEW version:  #######################
+  ##comment from ghan 05072024: this is the core 
+  ##algrithm to calculate the AUC of recovery curve
+  ##basic idea: 1)divide the whole auc into small bins
+  ##2) calcuate area of each bin: bin_with * bin_height
+  ##3) bin_height: y_th (the number o fgenes in geneset)
+  ## bin_width: calculate with diff(). it equals to difference
+  ## between the current bin's rank and the previous bin's rank
+  ##4) sum the area across all bins.
+  ## code below calulate  the largest possible AUC. 
+  ##final comment: algrithm is logically convoluted compared to
+  ##the figure used to depict the idea of AUC curve, but it's
+  ## computationally simple and nice.
+
   x_th <- 1:nrow(gSetRanks)
   x_th <- sort(x_th[x_th<aucThreshold])
   y_th <- seq_along(x_th)
@@ -274,6 +287,9 @@ setMethod("AUCell_calcAUC", "GeneSetCollection",
 # oneRanking <- gSetRanks[,3, with=FALSE]
 .auc <- function(oneRanking, aucThreshold, maxAUC)
 {
+  ##ghan 05072024: same algrithm to calulate the AUC
+  ##for each cell for a specific geneset.
+
   x <- unlist(oneRanking)
 
   x <- sort(x[x<aucThreshold])
